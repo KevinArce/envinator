@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+import { Command } from "commander";
+import { scanCodebase } from "./scanner";
+import { analyzeEnv } from "./analyzer";
+import { runWizard, printReport } from "./ui";
+
+const program = new Command();
+
+program
+    .name("env-wizard")
+    .description(
+        "🧙 A CLI tool that hunts down missing environment variables using AST analysis"
+    )
+    .version("1.0.0")
+    .option("-d, --dir <path>", "Directory to scan", ".")
+    .option("-e, --env <path>", "Path to .env file", ".env")
+    .option("-x, --example", "Also update .env.example", true)
+    .option("--no-example", "Skip updating .env.example")
+    .option("--dry-run", "Scan and print missing vars without writing")
+    .option("--lint", "Exit with error code if vars missing (CI mode)")
+    .action(async (options) => {
+        try {
+            // Auto-enable lint mode in non-TTY environments (CI/CD)
+            const isInteractive = process.stdout.isTTY ?? false;
+            const lintMode = options.lint || !isInteractive;
+            const dryRun = options.dryRun || false;
+            const updateExample = options.example ?? true;
+
+            // 1. Scan codebase
+            const scanResult = await scanCodebase(options.dir);
+
+            // 2. Analyze against .env
+            const report = analyzeEnv(scanResult, options.env);
+
+            const missingCount = report.missing.length + report.empty.length;
+
+            // 3. Handle based on mode
+            if (lintMode) {
+                // CI Mode: Just report and exit
+                printReport(report, scanResult.filesScanned);
+
+                if (scanResult.warnings && scanResult.warnings.length > 0) {
+                    console.warn("\n⚠️  Warnings:");
+                    scanResult.warnings.forEach((w) => console.warn(`   ${w}`));
+                }
+
+                if (missingCount > 0) {
+                    console.error(
+                        `\n❌ Found ${missingCount} missing/empty environment variables.`
+                    );
+                    process.exit(1);
+                } else {
+                    console.log("\n✅ All environment variables are configured.");
+                    process.exit(0);
+                }
+            } else if (dryRun) {
+                // Dry Run: Report what would happen
+                printReport(report, scanResult.filesScanned);
+                console.log("\n📋 Dry run complete. No files were modified.");
+            } else {
+                // Interactive Mode: Run the wizard
+                await runWizard(report, {
+                    envPath: options.env,
+                    updateExample,
+                });
+            }
+        } catch (error) {
+            console.error("❌ Error:", error instanceof Error ? error.message : error);
+            process.exit(1);
+        }
+    });
+
+program.parse();

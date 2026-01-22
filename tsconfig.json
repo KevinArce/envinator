@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        /* --- Base Configuration --- */
+        "target": "ES2022", /* Target modern Node.js versions (Node 16+). */
+        "module": "CommonJS", /* Standard module system for Node CLIs. */
+        "moduleResolution": "node", /* Resolve modules like Node.js does. */
+        "outDir": "./dist", /* Output compiled JS to 'dist' folder. */
+        "rootDir": "./src", /* Source code location. */
+        "removeComments": true, /* Keep build artifacts small. */
+        /* --- Strict Type-Checking --- */
+        "strict": true, /* Enable all strict type-checking options. */
+        "noImplicitAny": true, /* Raise error on expressions with implied 'any' type. */
+        "strictNullChecks": true, /* Essential for handling nullable env vars safely. */
+        "noUnusedLocals": true, /* Catch variables you defined but didn't use. */
+        "noUnusedParameters": true, /* Catch unused function parameters. */
+        "noImplicitReturns": true, /* Ensure all code paths in functions return a value. */
+        /* --- Interop & Libraries --- */
+        "esModuleInterop": true, /* Allow default imports from CommonJS modules (like 'fs' or 'path'). */
+        "resolveJsonModule": true, /* Allow importing package.json to display version number in CLI. */
+        "skipLibCheck": true, /* Skip type checking of declaration files (speeds up compilation significantly). */
+        "forceConsistentCasingInFileNames": true /* Prevent issues on Case-Insensitive OS (Windows/macOS). */
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.test.ts" /* Exclude test files from the build output */
+    ],
+    /* --- ts-node Configuration (for development) --- */
+    "ts-node": {
+        "transpileOnly": true, /* Faster execution in dev mode by skipping type checking */
+        "files": true
+    }
+}

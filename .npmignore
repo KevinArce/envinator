@@ -1,0 +1,17 @@
+# Ignore source TS files
+src/
+tests/
+.github/
+
+# Ignore config/local files
+.env
+.env.*
+tsconfig.json
+.prettierrc
+.eslintrc.js
+
+# Allow
+!dist/
+!README.md
+!LICENSE
+!package.json
