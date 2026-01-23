@@ -50,7 +50,7 @@ describe("Writer", () => {
             appendToEnv(".env", { KEY: "value" });
 
             const content = fs.readFileSync(path.join(tempDir, ".env"), "utf-8");
-            expect(content).toContain("# --- Added by env-wizard");
+            expect(content).toContain("# --- Added by Envinator");
         });
 
         it("should return keysWritten = 0 for empty values", () => {
