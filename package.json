@@ -2,7 +2,7 @@
   "name": "envinator",
   "version": "1.0.0",
   "description": "A cybernetic organism sent back in time to terminate missing environment variables.",
-  "author": "Your Name",
+  "author": "Kevin Arce",
   "license": "MIT",
   "keywords": [
     "env",
