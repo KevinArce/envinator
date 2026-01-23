@@ -1,8 +1,5 @@
 {
-  "name": "@kevinarce/envinator",
-  "publishConfig": {
-    "access": "public"
-  },
+  "name": "envinator-cli",
   "version": "1.0.0",
   "description": "A cybernetic organism sent back in time to terminate missing environment variables.",
   "author": "Kevin Arce",
