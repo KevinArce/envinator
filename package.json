@@ -19,7 +19,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/KevinArce/envinator"
+    "url": "git+https://github.com/KevinArce/envinator.git"
   },
   "bin": {
     "envinator": "dist/index.js"
