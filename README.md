@@ -1,48 +1,48 @@
-# 🧙 env-wizard
+# 🤖 Envinator
 
-> **"Zero-Config Safety"** — A developer should be able to run `npx env-wizard` in a fresh repo and be fully set up in seconds.
+> **"Come with me if you want to deploy."** — A developer should be able to run `npx envinator` in a fresh repo and be operational in seconds.
 
-**env-wizard** is a CLI tool that statically analyzes your codebase to identify all usages of `process.env`, compares them against your local `.env` file, and interactively guides you to populate missing variables.
+**Envinator** is a specialized CLI tool sent back in time to statically analyze your codebase. It identifies all usages of `process.env`, compares them against your local `.env` file, and ruthlessly prompts you to populate missing variables.
 
 No more `undefined` runtime errors. No more asking "What's the API key again?"
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Deployment Protocol
 
 You don't even need to install it. Just run it in your project root:
 
 ```bash
-npx env-wizard
+npx envinator
 ```
 
-env-wizard will:
+Envinator will:
 
-1. **Scan** your directory for `process.env` usages using AST analysis
-2. **Diff** them against your current `.env` file
-3. **Prompt** you interactively to fill in missing values
-4. **Update** your `.env` (and optionally `.env.example`)
+1. **Scan** your directory for `process.env` usages using AST analysis.
+2. **Identify** discrepancies against your current `.env` file.
+3. **Interrogate** you to fill in missing values.
+4. **Update** your `.env` (and optionally `.env.example`).
 
 ---
 
-## 🦾 Features
+## 🦾 Capabilities
 
-- **AST-Powered Scanning:** Uses `ts-morph` to parse your code. It won't get fooled by comments or strings like regex would.
-- **Destructuring Support:** Detects complex patterns like:
+- **Cybernetic AST Scanning:** Uses `ts-morph` to parse your code. It won't get fooled by comments or strings like regex would.
+- **Destructuring Detection:** Detects complex patterns like:
   ```typescript
-  const { DB_HOST, DB_PORT: port } = process.env; // Catches both!
+  const { DB_HOST, DB_PORT: port } = process.env; // Targets acquired.
   ```
 - **Secure Input:** Automatically masks sensitive keys (PASSWORD, KEY, SECRET, TOKEN) during input.
-- **Context Aware:** Shows you exactly *where* a variable is used (file & line number) so you know what value to provide.
-- **CI/CD Ready:** Auto-detects non-TTY environments and switches to lint mode.
+- **Target Location:** Shows you exactly *where* a variable is used (file & line number).
+- **Skynet Ready (CI/CD):** Auto-detects non-TTY environments and switches to lint mode.
 - **Zero Config:** Works out of the box for TypeScript and JavaScript projects.
 
 ---
 
-## 🛠 Usage & Options
+## 🛠 Usage & Directives
 
 ```bash
-npx env-wizard [options]
+npx envinator [options]
 ```
 
 | Option | Alias | Description | Default |
@@ -54,21 +54,21 @@ npx env-wizard [options]
 | `--dry-run` | | Scan and report without writing to disk | `false` |
 | `--lint` | | Exit code 1 if variables are missing (CI mode) | `false` |
 
-### CI/CD Pipeline Example
+### CI/CD Defense Grid
 
-Use env-wizard to fail your build if a developer forgot to add a new variable:
+Use Envinator to fail your build if a developer forgot to add a new variable:
 
 ```yaml
 # In your GitHub Action
-- name: Check environment variables
-  run: npx env-wizard --dir ./src --env .env.example --lint
+- name: Verify Environment Integrity
+  run: npx envinator --dir ./src --env .env.example --lint
 ```
 
 ---
 
-## 🧠 How It Works
+## 🧠 System Logic
 
-env-wizard uses `ts-morph` to build an Abstract Syntax Tree of your code. It looks for three access patterns:
+Envinator uses `ts-morph` to build an Abstract Syntax Tree of your code. It looks for three access patterns:
 
 1. **Property Access:** `process.env.API_URL`
 2. **Element Access:** `process.env['STRIPE_KEY']`
@@ -83,11 +83,11 @@ It ignores dynamic access (e.g., `process.env[dynamicVar]`) and warns you about 
 If you want to install it globally or as a dev dependency:
 
 ```bash
-npm install -D env-wizard
+npm install -D envinator
 # or
-yarn add -D env-wizard
+yarn add -D envinator
 # or
-pnpm add -D env-wizard
+pnpm add -D envinator
 ```
 
 Add it to your `package.json` scripts:
@@ -95,8 +95,8 @@ Add it to your `package.json` scripts:
 ```json
 {
   "scripts": {
-    "env:check": "env-wizard --lint",
-    "env:setup": "env-wizard"
+    "env:check": "envinator --lint",
+    "env:setup": "envinator"
   }
 }
 ```
@@ -124,7 +124,7 @@ npm run build
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+2. Create your feature branch (`git checkout -b feature/skynet-upgrade`)
 3. Commit your changes
 4. Push to the branch
 5. Open a Pull Request
@@ -137,4 +137,4 @@ MIT © 2026
 
 ---
 
-> *"Zero config. Zero undefined. Zero excuses."*
+> *"Hasta la vista, undefined."*

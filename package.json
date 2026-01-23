@@ -1,7 +1,7 @@
 {
-  "name": "env-wizard",
+  "name": "envinator",
   "version": "1.0.0",
-  "description": "A ruthless CLI tool that hunts down missing environment variables using AST analysis",
+  "description": "A cybernetic organism sent back in time to terminate missing environment variables.",
   "author": "Your Name",
   "license": "MIT",
   "keywords": [
@@ -19,7 +19,7 @@
     "url": "https://github.com/your-username/env-wizard"
   },
   "bin": {
-    "env-wizard": "./dist/index.js"
+    "envinator": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

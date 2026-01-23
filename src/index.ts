@@ -7,9 +7,9 @@ import { runWizard, printReport } from "./ui";
 const program = new Command();
 
 program
-    .name("env-wizard")
+    .name("envinator")
     .description(
-        "🧙 A CLI tool that hunts down missing environment variables using AST analysis"
+        "🤖 A cybernetic organism sent back in time to terminate missing environment variables."
     )
     .version("1.0.0")
     .option("-d, --dir <path>", "Directory to scan", ".")
@@ -46,17 +46,17 @@ program
 
                 if (missingCount > 0) {
                     console.error(
-                        `\n❌ Found ${missingCount} missing/empty environment variables.`
+                        `\n❌ Critical Usage Error: Found ${missingCount} missing/empty environment variables.`
                     );
                     process.exit(1);
                 } else {
-                    console.log("\n✅ All environment variables are configured.");
+                    console.log("\n✅ Systems Nominal. All environment variables are configured.");
                     process.exit(0);
                 }
             } else if (dryRun) {
                 // Dry Run: Report what would happen
                 printReport(report, scanResult.filesScanned);
-                console.log("\n📋 Dry run complete. No files were modified.");
+                console.log("\n📋 Simulation complete. No files were terminated.");
             } else {
                 // Interactive Mode: Run the wizard
                 await runWizard(report, {

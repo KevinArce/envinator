@@ -21,14 +21,14 @@ export interface WizardOptions {
  * Prints a summary report of the analysis (for lint/dry-run modes).
  */
 export function printReport(report: AnalysisReport, filesScanned: number): void {
-    console.log(`\n🔍 Scanned ${filesScanned} files.\n`);
+    console.log(`\n🔍 Targets Scanned: ${filesScanned}.\n`);
 
     const total = report.all.length;
     const presentCount = report.present.length;
     const missingCount = report.missing.length;
     const emptyCount = report.empty.length;
 
-    console.log(`📊 Summary:`);
+    console.log(`📊 Mission Report:`);
     console.log(`   ✅ Present: ${presentCount}`);
     console.log(`   ❌ Missing: ${missingCount}`);
     console.log(`   ⚠️  Empty:   ${emptyCount}`);
@@ -63,10 +63,10 @@ export async function runWizard(
     const missingCount = report.missing.length + report.empty.length;
 
     // 1. Introduction
-    intro(`🧙 env-wizard found ${missingCount} missing variable${missingCount !== 1 ? "s" : ""}`);
+    intro(`🤖 Envinator Model T-800 online. Found ${missingCount} missing variable${missingCount !== 1 ? "s" : ""}.`);
 
     if (missingCount === 0) {
-        outro(`✅ All environment variables are configured!`);
+        outro(`✅ All systems operational. No missing variables.`);
         return;
     }
 
@@ -89,7 +89,7 @@ export async function runWizard(
         }
 
         const value = await text({
-            message: `Enter value for ${target.key}:`,
+            message: `Enter directive for ${target.key}:`,
             placeholder: isSecret ? "••••••••" : "your-value-here",
             initialValue: target.currentValue || "",
             validate(val) {
@@ -139,7 +139,7 @@ export async function runWizard(
         }
     }
 
-    outro(`🚀 env-wizard complete!`);
+    outro(`Hasta la vista, undefined.`);
 }
 
 /**
