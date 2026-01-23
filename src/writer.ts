@@ -32,7 +32,7 @@ export function appendToEnv(
     });
 
     const timestamp = new Date().toISOString().split("T")[0];
-    const header = `\n# --- Added by env-wizard (${timestamp}) ---\n`;
+    const header = `\n# --- Added by Envinator (${timestamp}) ---\n`;
     const content = header + newLines.join("\n") + "\n";
 
     try {
@@ -87,7 +87,7 @@ export function syncExampleFile(
         return { success: true, path: absolutePath, keysWritten: 0 };
     }
 
-    const header = `\n# --- Added by env-wizard ---\n`;
+    const header = `\n# --- Added by Envinator ---\n`;
     const content = header + newKeys.map((k) => `${k}=`).join("\n") + "\n";
 
     try {
