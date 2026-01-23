@@ -13,7 +13,7 @@ No more `undefined` runtime errors. No more asking "What's the API key again?"
 You don't even need to install it. Just run it in your project root:
 
 ```bash
-npx envinator
+npx envinator-cli
 ```
 
 Envinator will:
