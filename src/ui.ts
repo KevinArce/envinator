@@ -8,6 +8,7 @@ import {
     cancel,
     spinner,
     note,
+    password,
 } from "@clack/prompts";
 import { AnalysisReport } from "./analyzer";
 import { appendToEnv, syncExampleFile } from "./writer";
@@ -88,22 +89,35 @@ export async function runWizard(
             note(contextLines.join("\n"), `Used in:`);
         }
 
-        const value = await text({
-            message: `Enter directive for ${target.key}:`,
-            placeholder: isSecret ? "••••••••" : "your-value-here",
-            initialValue: target.currentValue || "",
-            validate(val) {
-                if (val.length === 0) return "Value is required!";
-                return undefined;
-            },
-        });
+        let value: string | symbol;
+
+        if (isSecret) {
+            value = await password({
+                message: `Enter directive for ${target.key}:`,
+                mask: "*",
+                validate(val: string) {
+                    if (val.length === 0) return "Value is required!";
+                    return undefined;
+                },
+            });
+        } else {
+            value = await text({
+                message: `Enter directive for ${target.key}:`,
+                placeholder: "your-value-here",
+                initialValue: target.currentValue || "",
+                validate(val: string) {
+                    if (val.length === 0) return "Value is required!";
+                    return undefined;
+                },
+            });
+        }
 
         if (isCancel(value)) {
             cancel("Wizard cancelled.");
             process.exit(0);
         }
 
-        collectedValues[target.key] = value;
+        collectedValues[target.key] = value as string;
     }
 
     // 3. Write to files
