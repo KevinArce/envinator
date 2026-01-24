@@ -1,6 +1,6 @@
 {
   "name": "envinator-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A cybernetic organism sent back in time to terminate missing environment variables.",
   "author": "Kevin Arce",
   "license": "MIT",
