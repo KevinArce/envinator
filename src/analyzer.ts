@@ -24,19 +24,19 @@ export interface AnalysisReport {
  * @param scanResult The output from the scanner module
  * @param envPath Path to the .env file (default: ./.env)
  */
-export function analyzeEnv(scanResult: ScanResult, envPath: string = ".env"): AnalysisReport {
+export async function analyzeEnv(scanResult: ScanResult, envPath: string = ".env"): Promise<AnalysisReport> {
     const absoluteEnvPath = path.resolve(process.cwd(), envPath);
     let envFileContent = "";
     let parsedEnv: Record<string, string> = {};
 
     // 1. Safe Load .env
     try {
-        if (fs.existsSync(absoluteEnvPath)) {
-            envFileContent = fs.readFileSync(absoluteEnvPath, "utf-8");
-            parsedEnv = dotenv.parse(envFileContent);
+        envFileContent = await fs.promises.readFile(absoluteEnvPath, "utf-8");
+        parsedEnv = dotenv.parse(envFileContent);
+    } catch (error: any) {
+        if (error.code !== "ENOENT") {
+            console.warn(`⚠️  Could not read ${envPath}, assuming all variables are missing.`);
         }
-    } catch (error) {
-        console.warn(`⚠️  Could not read ${envPath}, assuming all variables are missing.`);
     }
 
     const report: AnalysisReport = {

@@ -31,7 +31,7 @@ describe("Analyzer", () => {
     };
 
     describe("analyzeEnv", () => {
-        it("should categorize variables as MISSING when .env does not exist", () => {
+        it("should categorize variables as MISSING when .env does not exist", async () => {
             const scanResult = createMockScanResult(["API_KEY", "DB_HOST"]);
 
             // Change to temp dir so .env doesn't exist
@@ -39,7 +39,7 @@ describe("Analyzer", () => {
             process.chdir(tempDir);
 
             try {
-                const report = analyzeEnv(scanResult, ".env");
+                const report = await analyzeEnv(scanResult, ".env");
 
                 expect(report.missing.length).toBe(2);
                 expect(report.present.length).toBe(0);
@@ -49,7 +49,7 @@ describe("Analyzer", () => {
             }
         });
 
-        it("should categorize variables as PRESENT when defined with value", () => {
+        it("should categorize variables as PRESENT when defined with value", async () => {
             // Create .env with values
             fs.writeFileSync(envPath, "API_KEY=secret123\nDB_HOST=localhost\n");
 
@@ -59,7 +59,7 @@ describe("Analyzer", () => {
             process.chdir(tempDir);
 
             try {
-                const report = analyzeEnv(scanResult, ".env");
+                const report = await analyzeEnv(scanResult, ".env");
 
                 expect(report.present.length).toBe(2);
                 expect(report.missing.length).toBe(0);
@@ -69,7 +69,7 @@ describe("Analyzer", () => {
             }
         });
 
-        it("should categorize variables as EMPTY when defined but empty", () => {
+        it("should categorize variables as EMPTY when defined but empty", async () => {
             // Create .env with empty values
             fs.writeFileSync(envPath, "API_KEY=\nDB_HOST=   \n");
 
@@ -79,7 +79,7 @@ describe("Analyzer", () => {
             process.chdir(tempDir);
 
             try {
-                const report = analyzeEnv(scanResult, ".env");
+                const report = await analyzeEnv(scanResult, ".env");
 
                 expect(report.empty.length).toBe(2);
                 expect(report.present.length).toBe(0);
@@ -89,7 +89,7 @@ describe("Analyzer", () => {
             }
         });
 
-        it("should handle mixed scenarios correctly", () => {
+        it("should handle mixed scenarios correctly", async () => {
             // Create .env with mixed values
             fs.writeFileSync(envPath, "API_KEY=secret123\nDB_HOST=\n");
 
@@ -103,7 +103,7 @@ describe("Analyzer", () => {
             process.chdir(tempDir);
 
             try {
-                const report = analyzeEnv(scanResult, ".env");
+                const report = await analyzeEnv(scanResult, ".env");
 
                 expect(report.present.length).toBe(1);
                 expect(report.present[0].key).toBe("API_KEY");
@@ -118,14 +118,14 @@ describe("Analyzer", () => {
             }
         });
 
-        it("should include usage context in results", () => {
+        it("should include usage context in results", async () => {
             const scanResult = createMockScanResult(["API_KEY"]);
 
             const originalCwd = process.cwd();
             process.chdir(tempDir);
 
             try {
-                const report = analyzeEnv(scanResult, ".env");
+                const report = await analyzeEnv(scanResult, ".env");
 
                 expect(report.missing[0].usages.length).toBe(1);
                 expect(report.missing[0].usages[0].file).toBe("/test/file.ts");
@@ -135,7 +135,7 @@ describe("Analyzer", () => {
             }
         });
 
-        it("should populate all array with all variables", () => {
+        it("should populate all array with all variables", async () => {
             fs.writeFileSync(envPath, "API_KEY=value\n");
             const scanResult = createMockScanResult(["API_KEY", "MISSING"]);
 
@@ -143,7 +143,7 @@ describe("Analyzer", () => {
             process.chdir(tempDir);
 
             try {
-                const report = analyzeEnv(scanResult, ".env");
+                const report = await analyzeEnv(scanResult, ".env");
 
                 expect(report.all.length).toBe(2);
             } finally {
