@@ -117,3 +117,46 @@ export function generateDryRunReport(values: Record<string, string>): string {
 
     return `Would write to .env:\n${lines.join("\n")}`;
 }
+
+/**
+ * Generates a TypeScript declaration file for process.env.
+ * @param filePath Path to the output d.ts file
+ * @param keys Array of environment variable keys
+ */
+export function generateTypeDefinitions(
+    filePath: string,
+    keys: string[]
+): WriteResult {
+    const absolutePath = path.resolve(process.cwd(), filePath);
+
+    // Sort keys for deterministic output
+    const sortedKeys = [...keys].sort();
+
+    const lines = [
+        "declare global {",
+        "  namespace NodeJS {",
+        "    interface ProcessEnv {",
+        ...sortedKeys.map((k) => `      ${k}: string;`),
+        "    }",
+        "  }",
+        "}",
+        "",
+        "export {};",
+        "" // Trailing newline
+    ];
+
+    const content = lines.join("\n");
+
+    try {
+        // Ensure directory exists
+        const dir = path.dirname(absolutePath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        fs.writeFileSync(absolutePath, content);
+        return { success: true, path: absolutePath, keysWritten: sortedKeys.length };
+    } catch (error) {
+        return { success: false, path: absolutePath, keysWritten: 0 };
+    }
+}

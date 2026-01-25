@@ -9,7 +9,7 @@ describe("Writer", () => {
     let originalCwd: string;
 
     beforeEach(() => {
-        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "env-wizard-writer-"));
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "envinator-cli-writer-"));
         originalCwd = process.cwd();
         process.chdir(tempDir);
     });

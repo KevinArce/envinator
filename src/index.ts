@@ -14,6 +14,7 @@ program
     .version("1.0.0")
     .option("-d, --dir <path>", "Directory to scan", ".")
     .option("-e, --env <path>", "Path to .env file", ".env")
+    .option("-t, --types <path>", "Output path for TypeScript definitions (e.g., ./env.d.ts)")
     .option("-x, --example", "Also update .env.example", true)
     .option("--no-example", "Skip updating .env.example")
     .option("--dry-run", "Scan and print missing vars without writing")
@@ -33,6 +34,18 @@ program
             const report = analyzeEnv(scanResult, options.env);
 
             const missingCount = report.missing.length + report.empty.length;
+
+            if (options.types) {
+                const { generateTypeDefinitions } = await import("./writer");
+                const allKeys = report.all.map((v) => v.key);
+                const typeResult = generateTypeDefinitions(options.types, allKeys);
+
+                if (typeResult.success) {
+                    console.log(`\n📘 Generated Type Definitions: ${typeResult.path}`);
+                } else {
+                    console.error(`\n❌ Failed to generate type definitions at ${options.types}`);
+                }
+            }
 
             // 3. Handle based on mode
             if (lintMode) {

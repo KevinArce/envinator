@@ -11,7 +11,7 @@ describe("Analyzer", () => {
 
     beforeEach(() => {
         // Create temp directory for test files
-        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "env-wizard-test-"));
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "envinator-cli-test-"));
         envPath = path.join(tempDir, ".env");
     });
 

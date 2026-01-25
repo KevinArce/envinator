@@ -34,6 +34,7 @@ Envinator will:
   ```
 - **Secure Input:** Automatically masks sensitive keys (PASSWORD, KEY, SECRET, TOKEN) during input.
 - **Target Location:** Shows you exactly *where* a variable is used (file & line number).
+- **Auto-Generated Types:** Can generate a `env.d.ts` declaration file to strongly type usage of `process.env`.
 - **Skynet Ready (CI/CD):** Auto-detects non-TTY environments and switches to lint mode.
 - **Zero Config:** Works out of the box for TypeScript and JavaScript projects.
 
@@ -49,6 +50,7 @@ npx envinator [options]
 | --- | --- | --- | --- |
 | `--dir <path>` | `-d` | The directory to scan for code | `./` |
 | `--env <path>` | `-e` | Path to your environment file | `.env` |
+| `--types <path>` | `-t` | Output path for TypeScript definitions | |
 | `--example` | `-x` | Update .env.example with new keys | `true` |
 | `--no-example` | | Skip updating .env.example | |
 | `--dry-run` | | Scan and report without writing to disk | `false` |
