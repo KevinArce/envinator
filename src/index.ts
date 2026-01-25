@@ -31,7 +31,7 @@ program
             const scanResult = await scanCodebase(options.dir);
 
             // 2. Analyze against .env
-            const report = analyzeEnv(scanResult, options.env);
+            const report = await analyzeEnv(scanResult, options.env);
 
             const missingCount = report.missing.length + report.empty.length;
 
