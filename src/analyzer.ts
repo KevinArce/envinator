@@ -16,6 +16,7 @@ export interface AnalysisReport {
     missing: AnalyzedVar[];
     empty: AnalyzedVar[];
     present: AnalyzedVar[];
+    unused: AnalyzedVar[]; // Variables in .env but not in code
     all: AnalyzedVar[];
 }
 
@@ -43,6 +44,7 @@ export async function analyzeEnv(scanResult: ScanResult, envPath: string = ".env
         missing: [],
         empty: [],
         present: [],
+        unused: [],
         all: []
     };
 
@@ -76,6 +78,21 @@ export async function analyzeEnv(scanResult: ScanResult, envPath: string = ".env
         else if (status === "EMPTY") report.empty.push(analyzedVar);
         else report.present.push(analyzedVar);
     });
+
+    // 4. Check for Unused Variables (Dead Code)
+    // Keys in parsedEnv that were NOT iterated above (because they weren't in scanResult)
+    for (const envKey in parsedEnv) {
+        if (!scanResult.usages.has(envKey)) {
+            const analyzedVar: AnalyzedVar = {
+                key: envKey,
+                status: "PRESENT", // It exists in .env
+                usages: [], // No usages found in code
+                currentValue: parsedEnv[envKey]
+            };
+            report.unused.push(analyzedVar);
+            report.all.push(analyzedVar);
+        }
+    }
 
     return report;
 }

@@ -28,11 +28,13 @@ export function printReport(report: AnalysisReport, filesScanned: number): void 
     const presentCount = report.present.length;
     const missingCount = report.missing.length;
     const emptyCount = report.empty.length;
+    const unusedCount = report.unused.length;
 
     console.log(`📊 Mission Report:`);
     console.log(`   ✅ Present: ${presentCount}`);
     console.log(`   ❌ Missing: ${missingCount}`);
     console.log(`   ⚠️  Empty:   ${emptyCount}`);
+    console.log(`   🧹 Unused:  ${unusedCount}`);
     console.log(`   📦 Total:   ${total}`);
 
     if (report.missing.length > 0) {
@@ -48,6 +50,14 @@ export function printReport(report: AnalysisReport, filesScanned: number): void 
     if (report.empty.length > 0) {
         console.log(`\n⚠️  Empty Variables (defined but no value):`);
         for (const v of report.empty) {
+            console.log(`   • ${v.key}`);
+        }
+    }
+
+    if (report.unused.length > 0) {
+        console.log(`\n🧹 Dead Code Termination (Unused Var Detection):`);
+        console.log(`   "Target terminated. Variable is obsolete."`);
+        for (const v of report.unused) {
             console.log(`   • ${v.key}`);
         }
     }

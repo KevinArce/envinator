@@ -150,5 +150,27 @@ describe("Analyzer", () => {
                 process.chdir(originalCwd);
             }
         });
+
+        it("should detect unused variables (Dead Code)", async () => {
+            // Create .env with a variable that is NOT in scan results
+            fs.writeFileSync(envPath, "USED_VAR=val\nDEAD_VAR=rot\n");
+
+            // Only USED_VAR is in scan results
+            const scanResult = createMockScanResult(["USED_VAR"]);
+
+            const originalCwd = process.cwd();
+            process.chdir(tempDir);
+
+            try {
+                const report = await analyzeEnv(scanResult, ".env");
+
+                expect(report.unused.length).toBe(1);
+                expect(report.unused[0].key).toBe("DEAD_VAR");
+                expect(report.present.length).toBe(1);
+                expect(report.present[0].key).toBe("USED_VAR");
+            } finally {
+                process.chdir(originalCwd);
+            }
+        });
     });
 });
