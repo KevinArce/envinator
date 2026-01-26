@@ -13,7 +13,7 @@ No more `undefined` runtime errors. No more asking "What's the API key again?" N
 You don't even need to install it. Just run it in your project root:
 
 ```bash
-npx envinator
+npx envinator-cli
 ```
 
 Envinator will:
@@ -45,7 +45,7 @@ Envinator will:
 ## 🛠 Usage & Directives
 
 ```bash
-npx envinator [options]
+npx envinator-cli [options]
 ```
 
 | Option | Alias | Description | Default |
@@ -65,7 +65,7 @@ Use Envinator to fail your build if a developer forgot to add a new variable:
 ```yaml
 # In your GitHub Action
 - name: Verify Environment Integrity
-  run: npx envinator --dir ./src --env .env.example --lint
+  run: npx envinator-cli --dir ./src --env .env.example --lint
 ```
 
 ---
