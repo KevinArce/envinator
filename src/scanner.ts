@@ -22,6 +22,8 @@ export interface SecretLeak {
     context?: string;
 }
 
+const IGNORED_KEYS = new Set(["NODE_ENV"]);
+
 /**
  * Scans a directory for process.env usages using AST traversal.
  * @param rootDir The root directory to scan (e.g., "./src")
@@ -49,7 +51,7 @@ export async function scanCodebase(rootDir: string): Promise<ScanResult> {
         if (!key) return;
 
         // Filter out common false positives or system vars if needed
-        if (["NODE_ENV"].includes(key)) return;
+        if (IGNORED_KEYS.has(key)) return;
 
         const currentList = resultMap.get(key) || [];
         currentList.push({
