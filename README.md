@@ -4,7 +4,7 @@
 
 **Envinator** is a specialized CLI tool sent back in time to statically analyze your codebase. It identifies all usages of `process.env`, compares them against your local `.env` file, and ruthlessly prompts you to populate missing variables.
 
-No more `undefined` runtime errors. No more asking "What's the API key again?"
+No more `undefined` runtime errors. No more asking "What's the API key again?" Now with a custom **Envinator** theme.
 
 ---
 
@@ -34,6 +34,7 @@ Envinator will:
   ```
 - **Secure Input:** Automatically masks sensitive keys (PASSWORD, KEY, SECRET, TOKEN) during input.
 - **Target Location:** Shows you exactly *where* a variable is used (file & line number).
+- **Unused Variable Detection:** Identifies variables in your `.env` that are *not* used in your codebase, keeping your config clean.
 - **Auto-Generated Types:** Can generate a `env.d.ts` declaration file to strongly type usage of `process.env`.
 - **Skynet Ready (CI/CD):** Auto-detects non-TTY environments and switches to lint mode.
 - **Zero Config:** Works out of the box for TypeScript and JavaScript projects.
@@ -43,7 +44,7 @@ Envinator will:
 ## 🛠 Usage & Directives
 
 ```bash
-npx envinator [options]
+npx envinator-cli [options]
 ```
 
 | Option | Alias | Description | Default |
@@ -85,11 +86,11 @@ It ignores dynamic access (e.g., `process.env[dynamicVar]`) and warns you about 
 If you want to install it globally or as a dev dependency:
 
 ```bash
-npm install -D envinator
+npm install -D envinator-cli
 # or
-yarn add -D envinator
+yarn add -D envinator-cli
 # or
-pnpm add -D envinator
+pnpm add -D envinator-cli
 ```
 
 Add it to your `package.json` scripts:

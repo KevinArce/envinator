@@ -12,6 +12,7 @@ import {
 } from "@clack/prompts";
 import { AnalysisReport } from "./analyzer";
 import { appendToEnv, syncExampleFile } from "./writer";
+import { bootSequence, printHudBorder, scanAnimation } from "./branding";
 
 export interface WizardOptions {
     envPath: string;
@@ -30,7 +31,7 @@ export function printReport(report: AnalysisReport, filesScanned: number): void 
     const emptyCount = report.empty.length;
     const unusedCount = report.unused.length;
 
-    console.log(`📊 Mission Report:`);
+    printHudBorder(`Mission Report`);
     console.log(`   ✅ Present: ${presentCount}`);
     console.log(`   ❌ Missing: ${missingCount}`);
     console.log(`   ⚠️  Empty:   ${emptyCount}`);
@@ -74,6 +75,9 @@ export async function runWizard(
     const missingCount = report.missing.length + report.empty.length;
 
     // 1. Introduction
+    await bootSequence();
+    await scanAnimation();
+
     intro(`🤖 Envinator Model T-800 online. Found ${missingCount} missing variable${missingCount !== 1 ? "s" : ""}.`);
 
     if (missingCount === 0) {
