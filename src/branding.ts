@@ -51,7 +51,7 @@ export async function bootSequence() {
     // I will assume standard coloring for now or just print it.
 
     console.log(ENVINATOR_LABEL);
-    console.log("\n\x1b[1m   Made with ❤️ using Antigravity\x1b[0m\n");
+    console.log("\n\x1b[1m   Made with ❤️  using Antigravity\x1b[0m\n");
     await setTimeout(800);
 }
 

@@ -59,13 +59,30 @@ describe("Scanner", () => {
         it("should count files scanned", async () => {
             const result = await scanCodebase(fixturesDir);
 
-            expect(result.filesScanned).toBe(2); // simple.ts and complex-destructuring.ts
+            expect(result.filesScanned).toBe(3); // simple.ts, complex-destructuring.ts, and secrets.ts
         });
 
         it("should ignore NODE_ENV by default", async () => {
             const result = await scanCodebase(fixturesDir);
 
             expect(result.usages.has("NODE_ENV")).toBe(false);
+        });
+
+        it("should detect hardcoded secrets", async () => {
+            const result = await scanCodebase(fixturesDir);
+
+            expect(result.secrets).toBeDefined();
+            // We expect at least 4 secrets from secrets.ts
+            expect(result.secrets.length).toBeGreaterThanOrEqual(4);
+
+            const secretValues = result.secrets.map(s => s.value);
+            expect(secretValues).toContain("sk_live_1234567890abcdef");
+            expect(secretValues).toContain("ghp_abcdef1234567890");
+            expect(secretValues).toContain("xoxb-1234-5678-abcdef");
+            expect(secretValues).toContain("sk_live_embedded_in_function_call");
+
+            // Should not flag normal strings
+            expect(secretValues).not.toContain("just a normal string");
         });
     });
 });

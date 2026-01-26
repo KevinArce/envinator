@@ -50,7 +50,7 @@ program
             // 3. Handle based on mode
             if (lintMode) {
                 // CI Mode: Just report and exit
-                printReport(report, scanResult.filesScanned);
+                printReport(report, scanResult);
 
                 if (scanResult.warnings && scanResult.warnings.length > 0) {
                     console.warn("\n⚠️  Warnings:");
@@ -68,7 +68,7 @@ program
                 }
             } else if (dryRun) {
                 // Dry Run: Report what would happen
-                printReport(report, scanResult.filesScanned);
+                printReport(report, scanResult);
                 console.log("\n📋 Simulation complete. No files were terminated.");
             } else {
                 // Interactive Mode: Run the wizard

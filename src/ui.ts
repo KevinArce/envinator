@@ -13,6 +13,7 @@ import {
 import { AnalysisReport } from "./analyzer";
 import { appendToEnv, syncExampleFile } from "./writer";
 import { bootSequence, printHudBorder, scanAnimation } from "./branding";
+import { ScanResult } from "./scanner";
 
 export interface WizardOptions {
     envPath: string;
@@ -22,8 +23,8 @@ export interface WizardOptions {
 /**
  * Prints a summary report of the analysis (for lint/dry-run modes).
  */
-export function printReport(report: AnalysisReport, filesScanned: number): void {
-    console.log(`\n🔍 Targets Scanned: ${filesScanned}.\n`);
+export function printReport(report: AnalysisReport, scanResult: ScanResult): void {
+    console.log(`\n🔍 Targets Scanned: ${scanResult.filesScanned}.\n`);
 
     const total = report.all.length;
     const presentCount = report.present.length;
@@ -60,6 +61,15 @@ export function printReport(report: AnalysisReport, filesScanned: number): void 
         console.log(`   "Target terminated. Variable is obsolete."`);
         for (const v of report.unused) {
             console.log(`   • ${v.key}`);
+        }
+    }
+
+    if (scanResult.secrets && scanResult.secrets.length > 0) {
+        console.log(`\n🚨 Security Warnings (Hardcoded Secrets Detected):`);
+        for (const secret of scanResult.secrets) {
+            const masked = secret.value.substring(0, 4) + "*".repeat(secret.value.length - 4);
+            const location = `${path.basename(secret.file)}:${secret.line}`;
+            console.log(`   • ${masked} (${secret.context}) at ${location}`);
         }
     }
 }

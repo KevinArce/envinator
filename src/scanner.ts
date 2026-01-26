@@ -12,6 +12,14 @@ export interface ScanResult {
     usages: Map<string, EnvUsage[]>;
     filesScanned: number;
     warnings: string[];
+    secrets: SecretLeak[];
+}
+
+export interface SecretLeak {
+    value: string;
+    file: string;
+    line: number;
+    context?: string;
 }
 
 /**
@@ -33,6 +41,7 @@ export async function scanCodebase(rootDir: string): Promise<ScanResult> {
     const sourceFiles = project.getSourceFiles();
     const resultMap = new Map<string, EnvUsage[]>();
     const warnings: string[] = [];
+    const secrets: SecretLeak[] = [];
 
     // Helper to add usage to map
     const addUsage = (key: string, node: Node) => {
@@ -102,12 +111,42 @@ export async function scanCodebase(rootDir: string): Promise<ScanResult> {
                 }
             }
         });
+
+        // --- STRATEGY D: Secret Leak Detection ---
+        file.forEachDescendant(node => {
+            if (Node.isStringLiteral(node)) {
+                const text = node.getLiteralValue();
+                if (isSecret(text)) {
+                    // Determine context
+                    let context = "unknown usage";
+                    const parent = node.getParent();
+
+                    if (Node.isVariableDeclaration(parent)) {
+                        context = `assigned to const/let '${parent.getName()}'`;
+                    } else if (Node.isBinaryExpression(parent)) {
+                        context = `assigned to '${parent.getLeft().getText()}'`;
+                    } else if (Node.isCallExpression(parent)) {
+                        context = `passed to function '${parent.getExpression().getText()}'`;
+                    } else if (Node.isPropertyAssignment(parent)) {
+                        context = `property '${parent.getName()}' in object`;
+                    }
+
+                    secrets.push({
+                        value: text,
+                        file: node.getSourceFile().getFilePath(),
+                        line: node.getStartLineNumber(),
+                        context
+                    });
+                }
+            }
+        });
     }
 
     return {
         usages: resultMap,
         filesScanned: sourceFiles.length,
-        warnings
+        warnings,
+        secrets
     };
 }
 
@@ -118,4 +157,12 @@ function isProcessEnv(node: Node): boolean {
     // Simple textual check is usually sufficient and fastest for this specific case
     // Matches "process.env" exactly
     return node.getText() === "process.env";
+}
+
+/**
+ * Checks if a string looks like a hardcoded secret.
+ */
+function isSecret(value: string): boolean {
+    const prefixes = ["sk_live_", "ghp_", "xoxb-"];
+    return prefixes.some(p => value.startsWith(p));
 }

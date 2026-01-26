@@ -34,6 +34,7 @@ Envinator will:
   ```
 - **Secure Input:** Automatically masks sensitive keys (PASSWORD, KEY, SECRET, TOKEN) during input.
 - **Target Location:** Shows you exactly *where* a variable is used (file & line number).
+- **Secret Leak Detection:** Scans for hardcoded secrets (e.g., `sk_live_...`, `ghp_...`) in your source code and warns you immediately.
 - **Unused Variable Detection:** Identifies variables in your `.env` that are *not* used in your codebase, keeping your config clean.
 - **Auto-Generated Types:** Can generate a `env.d.ts` declaration file to strongly type usage of `process.env`.
 - **Skynet Ready (CI/CD):** Auto-detects non-TTY environments and switches to lint mode.
