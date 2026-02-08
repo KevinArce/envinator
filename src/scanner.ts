@@ -165,7 +165,20 @@ export async function scanCodebase(rootDir: string): Promise<ScanResult> {
 function isProcessEnv(node: Node): boolean {
     // Simple textual check is usually sufficient and fastest for this specific case
     // Matches "process.env" exactly
-    return node.getText() === "process.env";
+    // Check for PropertyAccess: process.env or process?.env
+    if (Node.isPropertyAccessExpression(node)) {
+        // PERF: Check name first to short-circuit
+        return node.getName() === "env" && node.getExpression().getText() === "process";
+    }
+    // Check for ElementAccess: process['env'] or process?.['env']
+    if (Node.isElementAccessExpression(node)) {
+        const arg = node.getArgumentExpression();
+        // PERF: Check arg literal value first
+        return Node.isStringLiteral(arg) &&
+            arg.getLiteralValue() === "env" &&
+            node.getExpression().getText() === "process";
+    }
+    return false;
 }
 
 /**
