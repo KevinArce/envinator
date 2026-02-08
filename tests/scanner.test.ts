@@ -44,11 +44,10 @@ describe("Scanner", () => {
 
             expect(apiKeyUsages).toBeDefined();
             expect(apiKeyUsages!.length).toBeGreaterThan(0);
-
-            // Find usage in simple.ts specifically
-            const simpleUsage = apiKeyUsages!.find(u => u.file.endsWith("simple.ts"));
-            expect(simpleUsage).toBeDefined();
-            expect(simpleUsage!.line).toBeGreaterThan(0);
+            expect(apiKeyUsages).toBeDefined();
+            expect(apiKeyUsages!.length).toBeGreaterThan(0);
+            expect(apiKeyUsages!.some(u => u.file.includes("simple.ts"))).toBe(true);
+            expect(apiKeyUsages!.find(u => u.file.includes("simple.ts"))!.line).toBeGreaterThan(0);
         });
 
         it("should generate warnings for dynamic access", async () => {
@@ -65,9 +64,7 @@ describe("Scanner", () => {
         it("should count files scanned", async () => {
             const result = await scanCodebase(fixturesDir);
 
-            // We expect at least the 3 base fixture files.
-            // In some environments (CI), there might be extra files (e.g. comprehensive.ts).
-            expect(result.filesScanned).toBeGreaterThanOrEqual(3);
+            expect(result.filesScanned).toBe(3); // simple.ts, complex-destructuring.ts, and secrets.ts
         });
 
         it("should ignore NODE_ENV by default", async () => {
