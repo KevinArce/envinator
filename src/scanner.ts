@@ -1,4 +1,4 @@
-import { Project, SyntaxKind, Node } from "ts-morph";
+import { Project, SyntaxKind, Node, PropertyAccessExpression, ElementAccessExpression, VariableDeclaration, StringLiteral } from "ts-morph";
 import * as path from "path";
 
 // Data structures for our results
@@ -65,80 +65,87 @@ export async function scanCodebase(rootDir: string): Promise<ScanResult> {
     // 3. Iterate over every file
     for (const file of sourceFiles) {
 
-        // --- STRATEGY A: Direct Access (process.env.KEY) ---
-        // Find all PropertyAccessExpressions (e.g. obj.prop)
-        file.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression).forEach(node => {
-            if (isProcessEnv(node.getExpression())) {
-                addUsage(node.getName(), node);
-            }
-        });
-
-        // --- STRATEGY B: Bracket Access (process.env['KEY']) ---
-        // Find all ElementAccessExpressions (e.g. obj['prop'])
-        file.getDescendantsOfKind(SyntaxKind.ElementAccessExpression).forEach(node => {
-            if (isProcessEnv(node.getExpression())) {
-                // We only care if the argument is a String Literal
-                const arg = node.getArgumentExpression();
-                if (Node.isStringLiteral(arg)) {
-                    // remove quotes
-                    addUsage(arg.getLiteralValue(), node);
-                } else if (arg) {
-                    // Dynamic access detected - warn user
-                    const filePath = path.basename(node.getSourceFile().getFilePath());
-                    const line = node.getStartLineNumber();
-                    warnings.push(
-                        `Dynamic env access in ${filePath}:${line} - process.env[${arg.getText()}] cannot be analyzed statically.`
-                    );
-                }
-            }
-        });
-
-        // --- STRATEGY C: Destructuring (const { KEY } = process.env) ---
-        // Find VariableDeclarations where the initializer is process.env
-        file.getDescendantsOfKind(SyntaxKind.VariableDeclaration).forEach(node => {
-            const initializer = node.getInitializer();
-            if (initializer && isProcessEnv(initializer)) {
-                // Check the name node (the left side)
-                const nameNode = node.getNameNode();
-
-                // Ensure it is an ObjectBindingPattern (destructuring) -> { A, B }
-                if (Node.isObjectBindingPattern(nameNode)) {
-                    nameNode.getElements().forEach(element => {
-                        // Handle aliasing: const { DB_HOST: host } = process.env
-                        // propertyNameNode is the left side (DB_HOST), nameNode is the alias (host)
-                        // If no alias, propertyNameNode is undefined, and nameNode is the key.
-                        const envKeyNode = element.getPropertyNameNode() || element.getNameNode();
-                        addUsage(envKeyNode.getText(), element);
-                    });
-                }
-            }
-        });
-
-        // --- STRATEGY D: Secret Leak Detection ---
         file.forEachDescendant(node => {
-            if (Node.isStringLiteral(node)) {
-                const text = node.getLiteralValue();
-                if (isSecret(text)) {
-                    // Determine context
-                    let context = "unknown usage";
-                    const parent = node.getParent();
-
-                    if (Node.isVariableDeclaration(parent)) {
-                        context = `assigned to const/let '${parent.getName()}'`;
-                    } else if (Node.isBinaryExpression(parent)) {
-                        context = `assigned to '${parent.getLeft().getText()}'`;
-                    } else if (Node.isCallExpression(parent)) {
-                        context = `passed to function '${parent.getExpression().getText()}'`;
-                    } else if (Node.isPropertyAssignment(parent)) {
-                        context = `property '${parent.getName()}' in object`;
+            switch (node.getKind()) {
+                // --- STRATEGY A: Direct Access (process.env.KEY) ---
+                case SyntaxKind.PropertyAccessExpression: {
+                    const paNode = node as PropertyAccessExpression;
+                    if (isProcessEnv(paNode.getExpression())) {
+                        addUsage(paNode.getName(), paNode);
                     }
+                    break;
+                }
 
-                    secrets.push({
-                        value: text,
-                        file: node.getSourceFile().getFilePath(),
-                        line: node.getStartLineNumber(),
-                        context
-                    });
+                // --- STRATEGY B: Bracket Access (process.env['KEY']) ---
+                case SyntaxKind.ElementAccessExpression: {
+                    const eaNode = node as ElementAccessExpression;
+                    if (isProcessEnv(eaNode.getExpression())) {
+                        // We only care if the argument is a String Literal
+                        const arg = eaNode.getArgumentExpression();
+                        if (Node.isStringLiteral(arg)) {
+                            // remove quotes
+                            addUsage(arg.getLiteralValue(), eaNode);
+                        } else if (arg) {
+                            // Dynamic access detected - warn user
+                            const filePath = path.basename(eaNode.getSourceFile().getFilePath());
+                            const line = eaNode.getStartLineNumber();
+                            warnings.push(
+                                `Dynamic env access in ${filePath}:${line} - process.env[${arg.getText()}] cannot be analyzed statically.`
+                            );
+                        }
+                    }
+                    break;
+                }
+
+                // --- STRATEGY C: Destructuring (const { KEY } = process.env) ---
+                case SyntaxKind.VariableDeclaration: {
+                    const vdNode = node as VariableDeclaration;
+                    const initializer = vdNode.getInitializer();
+                    if (initializer && isProcessEnv(initializer)) {
+                        // Check the name node (the left side)
+                        const nameNode = vdNode.getNameNode();
+
+                        // Ensure it is an ObjectBindingPattern (destructuring) -> { A, B }
+                        if (Node.isObjectBindingPattern(nameNode)) {
+                            nameNode.getElements().forEach(element => {
+                                // Handle aliasing: const { DB_HOST: host } = process.env
+                                // propertyNameNode is the left side (DB_HOST), nameNode is the alias (host)
+                                // If no alias, propertyNameNode is undefined, and nameNode is the key.
+                                const envKeyNode = element.getPropertyNameNode() || element.getNameNode();
+                                addUsage(envKeyNode.getText(), element);
+                            });
+                        }
+                    }
+                    break;
+                }
+
+                // --- STRATEGY D: Secret Leak Detection ---
+                case SyntaxKind.StringLiteral: {
+                    const slNode = node as StringLiteral;
+                    const text = slNode.getLiteralValue();
+                    if (isSecret(text)) {
+                        // Determine context
+                        let context = "unknown usage";
+                        const parent = slNode.getParent();
+
+                        if (Node.isVariableDeclaration(parent)) {
+                            context = `assigned to const/let '${parent.getName()}'`;
+                        } else if (Node.isBinaryExpression(parent)) {
+                            context = `assigned to '${parent.getLeft().getText()}'`;
+                        } else if (Node.isCallExpression(parent)) {
+                            context = `passed to function '${parent.getExpression().getText()}'`;
+                        } else if (Node.isPropertyAssignment(parent)) {
+                            context = `property '${parent.getName()}' in object`;
+                        }
+
+                        secrets.push({
+                            value: text,
+                            file: slNode.getSourceFile().getFilePath(),
+                            line: slNode.getStartLineNumber(),
+                            context
+                        });
+                    }
+                    break;
                 }
             }
         });

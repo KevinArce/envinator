@@ -44,16 +44,21 @@ describe("Scanner", () => {
 
             expect(apiKeyUsages).toBeDefined();
             expect(apiKeyUsages!.length).toBeGreaterThan(0);
-            expect(apiKeyUsages![0].file).toContain("simple.ts");
-            expect(apiKeyUsages![0].line).toBeGreaterThan(0);
+            expect(apiKeyUsages).toBeDefined();
+            expect(apiKeyUsages!.length).toBeGreaterThan(0);
+            expect(apiKeyUsages!.some(u => u.file.includes("simple.ts"))).toBe(true);
+            expect(apiKeyUsages!.find(u => u.file.includes("simple.ts"))!.line).toBeGreaterThan(0);
         });
 
         it("should generate warnings for dynamic access", async () => {
             const result = await scanCodebase(fixturesDir);
 
             expect(result.warnings.length).toBeGreaterThan(0);
-            expect(result.warnings[0]).toContain("Dynamic env access");
-            expect(result.warnings[0]).toContain("dynamicKey");
+            // We just check that *some* warning is about dynamicKey,
+            // the order might vary depending on file processing order.
+            const dynamicWarning = result.warnings.find(w => w.includes("dynamicKey"));
+            expect(dynamicWarning).toBeDefined();
+            expect(dynamicWarning).toContain("Dynamic env access");
         });
 
         it("should count files scanned", async () => {
