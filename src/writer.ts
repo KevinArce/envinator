@@ -99,26 +99,6 @@ export function syncExampleFile(
 }
 
 /**
- * Generates a dry-run report of what would be written.
- * @param values Key-value pairs that would be written
- */
-export function generateDryRunReport(values: Record<string, string>): string {
-    const entries = Object.entries(values);
-    if (entries.length === 0) {
-        return "No changes would be made.";
-    }
-
-    const lines = entries.map(([key, val]) => {
-        // Mask sensitive values in report
-        const isSensitive = /key|secret|password|token|auth|credential/i.test(key);
-        const displayVal = isSensitive ? "********" : val;
-        return `  ${key}=${displayVal}`;
-    });
-
-    return `Would write to .env:\n${lines.join("\n")}`;
-}
-
-/**
  * Generates a TypeScript declaration file for process.env.
  * @param filePath Path to the output d.ts file
  * @param keys Array of environment variable keys

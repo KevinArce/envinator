@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { appendToEnv, syncExampleFile, generateDryRunReport } from "../src/writer";
+import { appendToEnv, syncExampleFile } from "../src/writer";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -94,28 +94,4 @@ describe("Writer", () => {
         });
     });
 
-    describe("generateDryRunReport", () => {
-        it("should generate report with key-value pairs", () => {
-            const report = generateDryRunReport({ API_KEY: "secret" });
-
-            expect(report).toContain("Would write to .env");
-            expect(report).toContain("API_KEY=");
-        });
-
-        it("should mask sensitive values", () => {
-            const report = generateDryRunReport({
-                API_KEY: "secret123",
-                PASSWORD: "mysecret",
-            });
-
-            expect(report).toContain("API_KEY=********");
-            expect(report).toContain("PASSWORD=********");
-        });
-
-        it("should return 'No changes' for empty values", () => {
-            const report = generateDryRunReport({});
-
-            expect(report).toBe("No changes would be made.");
-        });
-    });
 });
