@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/KevinArce/envinator/compare/v1.0.1...v1.0.2) (2026-02-15)
+
+
+### Bug Fixes
+
+* **security:** implement secure masking for hardcoded secrets ([85dcff4](https://github.com/KevinArce/envinator/commit/85dcff4b98599da2929d3d15c2a4d16c6726eb31))
+
 ## [1.0.1](https://github.com/KevinArce/envinator/compare/v1.0.0...v1.0.1) (2026-02-15)
 
 
