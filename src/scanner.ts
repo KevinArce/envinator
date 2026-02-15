@@ -168,10 +168,11 @@ function isProcessEnv(node: Node): boolean {
     return node.getText() === "process.env";
 }
 
+const SECRET_PREFIXES = ["sk_live_", "ghp_", "xoxb-"];
+
 /**
  * Checks if a string looks like a hardcoded secret.
  */
 function isSecret(value: string): boolean {
-    const prefixes = ["sk_live_", "ghp_", "xoxb-"];
-    return prefixes.some(p => value.startsWith(p));
+    return SECRET_PREFIXES.some(p => value.startsWith(p));
 }
