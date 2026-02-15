@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { appendToEnv, syncExampleFile, generateDryRunReport } from "../src/writer";
+import {
+    appendToEnv,
+    syncExampleFile,
+    generateDryRunReport,
+    generateTypeDefinitions,
+} from "../src/writer";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -116,6 +121,58 @@ describe("Writer", () => {
             const report = generateDryRunReport({});
 
             expect(report).toBe("No changes would be made.");
+        });
+    });
+
+    describe("generateTypeDefinitions", () => {
+        it("should generate valid .d.ts content", () => {
+            const filePath = "types/env.d.ts";
+            const keys = ["API_KEY", "PORT"];
+            const result = generateTypeDefinitions(filePath, keys);
+
+            expect(result.success).toBe(true);
+            expect(result.keysWritten).toBe(2);
+
+            const content = fs.readFileSync(path.join(tempDir, filePath), "utf-8");
+            expect(content).toContain("interface ProcessEnv {");
+            expect(content).toContain("API_KEY: string;");
+            expect(content).toContain("PORT: string;");
+            expect(content).toContain("export {};");
+        });
+
+        it("should sort keys for deterministic output", () => {
+            const filePath = "env.d.ts";
+            const keys = ["Z_KEY", "A_KEY", "M_KEY"];
+            generateTypeDefinitions(filePath, keys);
+
+            const content = fs.readFileSync(path.join(tempDir, filePath), "utf-8");
+            const aIndex = content.indexOf("A_KEY");
+            const mIndex = content.indexOf("M_KEY");
+            const zIndex = content.indexOf("Z_KEY");
+
+            expect(aIndex).toBeLessThan(mIndex);
+            expect(mIndex).toBeLessThan(zIndex);
+        });
+
+        it("should create directories if they do not exist", () => {
+            const filePath = "deeply/nested/dir/env.d.ts";
+            const result = generateTypeDefinitions(filePath, ["KEY"]);
+
+            expect(result.success).toBe(true);
+            expect(
+                fs.existsSync(path.join(tempDir, "deeply/nested/dir/env.d.ts"))
+            ).toBe(true);
+        });
+
+        it("should handle empty keys array", () => {
+            const filePath = "empty.d.ts";
+            const result = generateTypeDefinitions(filePath, []);
+
+            expect(result.success).toBe(true);
+            expect(result.keysWritten).toBe(0);
+            const content = fs.readFileSync(path.join(tempDir, filePath), "utf-8");
+            expect(content).toContain("interface ProcessEnv {");
+            expect(content).toContain("}");
         });
     });
 });
