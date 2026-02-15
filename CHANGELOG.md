@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/KevinArce/envinator/compare/v1.0.0...v1.0.1) (2026-02-15)
+
+
+### Performance Improvements
+
+* move constant array outside of isSecret function ([a899aa5](https://github.com/KevinArce/envinator/commit/a899aa57763fbdd9b20ff417f5397da40e2c5416))
+
 # 1.0.0 (2026-02-08)
 
 
