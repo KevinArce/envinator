@@ -152,6 +152,9 @@ export async function runWizard(
 
     if (!writeResult.success) {
         s.stop("Failed to write .env file.");
+        if (writeResult.error) {
+            console.error(`Error details: ${writeResult.error.message}`);
+        }
         cancel("Could not write to .env file.");
         return;
     }
