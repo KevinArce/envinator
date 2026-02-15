@@ -67,7 +67,7 @@ export function printReport(report: AnalysisReport, scanResult: ScanResult): voi
     if (scanResult.secrets && scanResult.secrets.length > 0) {
         console.log(`\n🚨 Security Warnings (Hardcoded Secrets Detected):`);
         for (const secret of scanResult.secrets) {
-            const masked = secret.value.substring(0, 4) + "*".repeat(secret.value.length - 4);
+            const masked = maskSecret(secret.value);
             const location = `${path.basename(secret.file)}:${secret.line}`;
             console.log(`   • ${masked} (${secret.context}) at ${location}`);
         }
@@ -178,6 +178,26 @@ export async function runWizard(
     }
 
     outro(`Hasta la vista, undefined.`);
+}
+
+/**
+ * Safely masks a secret for display.
+ * Reveals a small portion of the secret to help identification,
+ * but ensures it's not too much and avoids crashes for short strings.
+ */
+export function maskSecret(value: string): string {
+    const len = value.length;
+    if (len <= 4) {
+        return "*".repeat(len);
+    }
+
+    // Show at most 25% of the string, capped at 3 characters
+    const visibleLen = Math.min(Math.floor(len / 4), 3);
+
+    // Ensure we show at least 1 character if the secret is longer than 4
+    const finalVisible = Math.max(visibleLen, 1);
+
+    return value.substring(0, finalVisible) + "*".repeat(len - finalVisible);
 }
 
 /**
