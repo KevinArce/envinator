@@ -59,6 +59,17 @@ describe("Writer", () => {
             expect(result.success).toBe(true);
             expect(result.keysWritten).toBe(0);
         });
+
+        it("should return error when writing fails", () => {
+            // Create a directory where the file should be to force a write error
+            // (EISDIR: illegal operation on a directory, open ...)
+            fs.mkdirSync(path.join(tempDir, ".env"));
+
+            const result = appendToEnv(".env", { KEY: "value" });
+
+            expect(result.success).toBe(false);
+            expect(result.error).toBeDefined();
+        });
     });
 
     describe("syncExampleFile", () => {

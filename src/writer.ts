@@ -5,6 +5,7 @@ export interface WriteResult {
     success: boolean;
     path: string;
     keysWritten: number;
+    error?: Error;
 }
 
 /**
@@ -43,7 +44,7 @@ export function appendToEnv(
         fs.appendFileSync(absolutePath, content);
         return { success: true, path: absolutePath, keysWritten: entries.length };
     } catch (error) {
-        return { success: false, path: absolutePath, keysWritten: 0 };
+        return { success: false, path: absolutePath, keysWritten: 0, error: error as Error };
     }
 }
 
@@ -93,8 +94,8 @@ export function syncExampleFile(
     try {
         fs.appendFileSync(absolutePath, content);
         return { success: true, path: absolutePath, keysWritten: newKeys.length };
-    } catch {
-        return { success: false, path: absolutePath, keysWritten: 0 };
+    } catch (error) {
+        return { success: false, path: absolutePath, keysWritten: 0, error: error as Error };
     }
 }
 
@@ -137,6 +138,6 @@ export function generateTypeDefinitions(
         fs.writeFileSync(absolutePath, content);
         return { success: true, path: absolutePath, keysWritten: sortedKeys.length };
     } catch (error) {
-        return { success: false, path: absolutePath, keysWritten: 0 };
+        return { success: false, path: absolutePath, keysWritten: 0, error: error as Error };
     }
 }
